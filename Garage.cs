@@ -22,13 +22,15 @@ namespace Ovning5
     {
         private T[] vehicles;
         private int count = 0;
-        public int Capacity { get; private set; }
+        public int capacity { get; private set; }
         public int Count => count;
 
         // Constructor with capacity
         public Garage(int capacity)
         {
-            SetCapacity(capacity);
+          
+            this.capacity = capacity;
+            vehicles = new T[capacity];
         }
         // Method to set capacity
         public void SetCapacity(int capacity)
@@ -37,8 +39,7 @@ namespace Ovning5
             {
                 throw new ArgumentException("Capacity must be a positive integer.");
             }
-            Capacity = capacity;
-            vehicles = new T[capacity];
+          
         }
 
         // Method to populate garage with vehicles
@@ -50,20 +51,26 @@ namespace Ovning5
             }
         }
 
+
         public void ParkVehicle(T vehicle)
         {
-            if (count < Capacity)
+            if (count >= capacity)
             {
-                vehicles[count++] = vehicle;
-                Console.WriteLine($"Vehicle with registration number {vehicle.RegistrationNumber} parked successfully.");
+                throw new InvalidOperationException("Garage is full.");
             }
-            else
+
+            
+            for (int i = 0; i < vehicles.Length; i++)
             {
-                Console.WriteLine("Garage is full. Cannot park more vehicles.");
+                if (vehicles[i] == null)
+                {
+                    vehicles[i] = vehicle;
+                    count++;
+                    return; // Exit the method once the vehicle is parked
+                }
             }
         }
 
-        
         public bool RemoveVehicle(string registrationNumber)
         {
             for (int i = 0; i < count; i++)
@@ -93,9 +100,20 @@ namespace Ovning5
                 }
             }
         }
-        
 
-   
+        public void PrintAllVehicles()
+        {
+            Console.WriteLine("Details of all parked vehicles:");
+            foreach (var vehicle in vehicles)
+            {
+                if (vehicle != null)
+                {
+                    Console.WriteLine(vehicle.ToString());
+                }
+            }
+        }
+
+
 
         public void ListTypesAndCounts()
         {
@@ -132,8 +150,10 @@ namespace Ovning5
                     return vehicle;
                 }
             }
-            return null; // Vehicle not found
+            return null;
         }
+
+
 
         public IEnumerable<T> Search(Func<T, bool> predicate)
         {

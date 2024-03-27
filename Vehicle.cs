@@ -15,58 +15,115 @@ namespace Ovning5
         string Color { get; set; }
         int NumberOfWheels { get; set; }
 
-       // void Start();
-        //void Stop();
     }
-    //class vehicle
-    public class Vehicle : IVehicle 
+  
+    public class Vehicle : IVehicle
     {
-        public string RegistrationNumber { get; set; }
-        public string Color { get; set; }
-        public int NumberOfWheels { get; set; }
+        private string registrationNumber;
+        private string color;
+        private int numberOfWheels;
 
-        // Constructor that accepts registration number, color, and fuel type
+        public string RegistrationNumber
+        {
+            get => registrationNumber;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                    throw new ArgumentException("Registration number cannot be null or whitespace.");
+                registrationNumber = value;
+            }
+        }
+
+        public string Color
+        {
+            get => color;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                    throw new ArgumentException("Color cannot be null or whitespace.");
+                color = value;
+            }
+        }
+
+        public int NumberOfWheels
+        {
+            get => numberOfWheels;
+            set
+            {
+                if (value <= 0)
+                    throw new ArgumentException("Number of wheels must be greater than zero.");
+                numberOfWheels = value;
+            }
+        }
+
         public Vehicle(string regNumber, string color, int numberOfWheels)
         {
             RegistrationNumber = regNumber;
             Color = color;
             NumberOfWheels = numberOfWheels;
         }
-        
     }
 
-    // subclass car
+  
+ 
     public class Car : Vehicle
     {
-        public string FuelType { get; set; }
+        private string fuelType;
 
-        public Car(string regNumber, string color, int numberOfWheels, string fuelType) : base(regNumber, color, numberOfWheels)
+        public string FuelType
         {
-            NumberOfWheels = 4;
+            get => fuelType;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                    throw new ArgumentException("Fuel type cannot be null or whitespace.");
+                fuelType = value;
+            }
+        }
+
+        public Car(string regNumber, string color, int numberOfWheels, string fuelType)
+            : base(regNumber, color, ValidateNumberOfWheels(numberOfWheels))
+        {
             FuelType = fuelType;
         }
-        // Override ToString method to provide a custom string representation of a Car object
+
+        private static int ValidateNumberOfWheels(int numberOfWheels)
+        {
+            if (numberOfWheels != 4)
+                throw new ArgumentException("A car must have 4 wheels.");
+            return numberOfWheels;
+        }
+
         public override string ToString()
         {
-            return $"Car - Registration Number: {RegistrationNumber}, Color: {Color}, number of wheels: {NumberOfWheels} Fuel Type: {FuelType}";
+            return $"Car - Registration Number: {RegistrationNumber}, Color: {Color}, Number of Wheels: {NumberOfWheels}, Fuel Type: {FuelType}";
         }
     }
-    // subclass motorcycle
+
+
     public class Motorcycle : Vehicle
     {
         public string Cylinder { get; set; }
 
-        public Motorcycle(string regNumber, string color, int numberOfWheels, string cylinder) : base(regNumber, color, numberOfWheels)
+        public Motorcycle(string regNumber, string color, int numberOfWheels, string cylinder)
+            : base(regNumber, color, ValidateNumberOfWheels(numberOfWheels))
         {
-            NumberOfWheels = 2;
             Cylinder = cylinder;
         }
-        // Override ToString method to provide a custom string representation of a Car object
+
+        private static int ValidateNumberOfWheels(int numberOfWheels)
+        {
+            if (numberOfWheels < 2 || numberOfWheels > 4)
+                throw new ArgumentException("A motorcycle must have 2, 3, or 4 wheels.");
+            return numberOfWheels;
+        }
+
         public override string ToString()
         {
-            return $"Motorcycle - Registration Number: {RegistrationNumber}, Color: {Color},  Type of motorcycle: {Cylinder}";
+            return $"Motorcycle - Registration Number: {RegistrationNumber}, Color: {Color}, Number of Wheels: {NumberOfWheels}, Type of Motorcycle: {Cylinder}";
         }
     }
+
     // subclass bus
     public class Bus : Vehicle
     {

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 
 using System;
+using System.Text.RegularExpressions;
 
 namespace Ovning5
 {
@@ -52,15 +53,12 @@ namespace Ovning5
                         ListParkedVehicles();
                         break;
                     case "4":
-                        ListTypesAndCounts();
-                        break;
-                    case "5":
                         FindVehicleByRegistrationNumber();
                         break;
-                    case "6":
+                    case "5":
                         SearchVehicles();
                         break;
-                    case "7":
+                    case "6":
                         exit = true;
                         break;
                     default:
@@ -72,12 +70,41 @@ namespace Ovning5
 
         private void ParkVehicle()
         {
+            int wheels;
+            string color;
+
             WriteOutput("Enter registration number: ");
             string regNumber = ReadInput();
-            WriteOutput("Enter color: ");
-            string color = ReadInput();
-            WriteOutput("Enter number of wheels: ");
-            int wheels = int.Parse(ReadInput());
+            
+            bool validColor = false;
+            do
+            {
+                WriteOutput("Enter color: ");
+                color = ReadInput();
+                if (!Regex.IsMatch(color, @"^[a-zA-Z]+$"))
+                {
+                    WriteOutput("Invalid input. Please enter a valid color (letters only).");
+                }
+                else
+                {
+                    validColor = true;
+                }
+            } while (!validColor);
+
+            bool validWheels = false;
+            do
+            {
+                WriteOutput("Enter number of wheels: ");
+                string input = ReadInput();
+                if (!int.TryParse(input, out wheels))
+                {
+                    WriteOutput("Invalid input. Please enter a valid integer for number of wheels.");
+                }
+                else
+                {
+                    validWheels = true;
+                }
+            } while (!validWheels);
 
             Vehicle vehicle = new Vehicle(regNumber, color, wheels);
             garageHandler.ParkVehicle(vehicle);
@@ -100,10 +127,9 @@ namespace Ovning5
             }
         }
 
-
+       
         private void ListTypesAndCounts()
         {
-          //  WriteOutput("Types of vehicles and their counts in the garage:");
             garageHandler.ListTypesAndCounts();
         }
 
@@ -122,10 +148,47 @@ namespace Ovning5
             }
         }
 
+        public void CreateMotorcycle()
+        {
+            Console.WriteLine("Enter registration number: ");
+            string regNumber = Console.ReadLine()!;
+
+            Console.WriteLine("Enter color: ");
+            string color = Console.ReadLine()!;
+
+            Console.WriteLine("Enter number of wheels (2, 3, or 4): ");
+            int numberOfWheels;
+            while (!int.TryParse(Console.ReadLine(), out numberOfWheels) || numberOfWheels < 2 || numberOfWheels > 4)
+            {
+                Console.WriteLine("Invalid input. A motorcycle must have 2, 3, or 4 wheels. Please enter a valid number: ");
+            }
+
+            Console.WriteLine("Enter cylinder type: ");
+            string cylinder = Console.ReadLine()!;
+
+            Motorcycle motorcycle = new Motorcycle(regNumber, color, numberOfWheels, cylinder);
+            AddVehicle(motorcycle);
+            Console.WriteLine("Motorcycle added successfully.");
+        }
+
+        private void AddVehicle(Motorcycle motorcycle)
+        {
+            throw new NotImplementedException();
+        }
+
         private void SearchVehicles()
         {
-            WriteOutput("Enter search criteria (e.g., number of wheels): ");
+            WriteOutput("Enter search criteria (e.g., number of wheels, color, RegNumber): ");
             string criteria = ReadInput();
+
+            // Validate search criteria
+            if (string.IsNullOrWhiteSpace(criteria))
+            {
+                WriteOutput("Invalid search criteria. Please enter a valid value.");
+                return;
+            }
+
+            // Perform search only if the criteria is not empty
             foreach (var vehicle in garageHandler.Search(vehicle => vehicle.Color.Equals(criteria, StringComparison.OrdinalIgnoreCase) || vehicle.NumberOfWheels.ToString().Equals(criteria)))
             {
                 WriteOutput($"Registration Number: {vehicle.RegistrationNumber}, Color: {vehicle.Color}, Number of Wheels: {vehicle.NumberOfWheels}");
@@ -134,7 +197,7 @@ namespace Ovning5
 
         public string ReadInput()
         {
-            return Console.ReadLine();
+            return Console.ReadLine()!;
         }
 
         public void WriteOutput(string output)
